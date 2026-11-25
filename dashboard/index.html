@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Token Radar 3 ranks 201 pre-token protocols by implied launch value, computed from a sealed DefiLlama snapshot: TVL, category multiple, growth vs the market, age, chain breadth, category leadership and TVL velocity.">
+<title>Token Radar 3 — pre-token protocols ranked by implied launch value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="dot"></span>TOKEN RADAR <b>3</b></div>
+  <div class="sub" id="metaLine">Loading the sealed snapshot…</div>
+</header>
+
+<section class="hero">
+  <h1>Which pre-token protocol is worth farming next?</h1>
+  <p class="lede">Every protocol below records <b>no token at all</b> — no market cap, no ticker, no listing — ranked by what its launch would be worth if its record stayed as it is. The value follows from the snapshot's own figures: TVL, the trimmed multiple its category's live tokens trade at, growth against the market, age, chain breadth, category leadership and TVL velocity. No protocol name is special-cased; the model reads the snapshot and ranks whatever it finds.</p>
+  <div class="stats" id="stats"></div>
+</section>
+
+<section class="controls">
+  <input id="q" type="search" placeholder="Search name or slug…" aria-label="Search">
+  <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+  <select id="chain" aria-label="Chain"><option value="">All chains</option></select>
+  <label class="chk"><input id="wl" type="checkbox"> Watchlist only</label>
+  <select id="sort" aria-label="Sort">
+    <option value="rank">Sort: rank</option>
+    <option value="value">Sort: implied value</option>
+    <option value="tvl">Sort: TVL</option>
+    <option value="growth">Sort: 7-day change</option>
+    <option value="age">Sort: age</option>
+  </select>
+</section>
+
+<main>
+  <table class="board" id="board">
+    <thead><tr>
+      <th>#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+      <th class="num">TVL</th><th class="num">7d</th><th class="num">Implied value</th><th>Why this rank</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="pager"><button id="prev">← Prev</button><span id="pageInfo"></span><button id="next">Next →</button></div>
+
+  <section class="detail" id="detail" hidden>
+    <button class="close" id="closeDetail">✕ Close</button>
+    <h2 id="dName"></h2>
+    <div class="dmeta" id="dMeta"></div>
+    <h3>Why this rank — the model, factor by factor</h3>
+    <table class="factors"><thead><tr><th>Factor</th><th>Input</th><th class="num">Multiplier</th></tr></thead><tbody id="dFactors"></tbody>
+    <tfoot><tr><td colspan="2">Implied value = TVL × all six</td><td class="num" id="dValue"></td></tr></tfoot></table>
+    <h3>Farm plan — 7 steps</h3>
+    <ol class="steps" id="dSteps"></ol>
+    <div class="risk" id="dRisk"></div>
+  </section>
+
+  <section class="apart">
+    <h2>Already trading — the 24 largest by market cap</h2>
+    <p class="note">These protocols have a token that trades. They are shown at their market value, apart from the board, and are never ranked as launches.</p>
+    <table class="mini"><thead><tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th></tr></thead><tbody id="liveRows"></tbody></table>
+  </section>
+
+  <section class="apart">
+    <h2>Ticker recorded, no market cap — not ranked</h2>
+    <p class="note">162 pre-token protocols record a ticker but no market cap, so their token status is unclear — most are sub-protocols of tokens that already trade (the largest is Morpho Blue at $10.4B TVL). They are shown apart, unranked, top 12 by TVL.</p>
+    <table class="mini"><thead><tr><th>Protocol</th><th>Ticker</th><th>Category</th><th class="num">TVL</th></tr></thead><tbody id="tickerRows"></tbody></table>
+  </section>
+
+  <section class="method">
+    <h2>Methodology — radar-3</h2>
+    <p><b>Implied value = TVL × category × growth × age × breadth × leadership × velocity.</b> Each factor is computed from the snapshot at run time; nothing is hardcoded by name.</p>
+    <ul>
+      <li><b>Category:</b> the trimmed multiple of the category's live-token market-cap/TVL ratios — ratios clipped to their interquartile range, then averaged (median for 3–4 comparables; the global trimmed mean, 0.382, when fewer than 3). Clamped to 0.05–1.50. A raw median ignores how wildly comparables disagree (Lending's ratios run 0.008 to 18.956); the trimmed mean uses the whole distribution.</li>
+      <li><b>Growth:</b> 1 + 0.5 × the protocol's 7-day TVL change <i>relative to the market median</i> (−8.23% this snapshot), clamped to −50%/+100%. A protocol growing while the market falls scores for it.</li>
+      <li><b>Age:</b> 0.80 + 0.20 × min(age, 730 days)/730 — older with no token scores higher; unknown age scores 0.90.</li>
+      <li><b>Breadth:</b> 1 + 0.08 × ln(chains)/ln(32), capped at 1.08 — running on more chains is wider distribution.</li>
+      <li><b>Leadership:</b> 1.12 for the largest pre-token protocol in its category by TVL, 1.06 for 2nd–3rd, else 1.00.</li>
+      <li><b>Velocity:</b> TVL per day since listing, in quartiles across the board — top quartile 1.08, third 1.03, second 1.00, bottom 0.95. Fast accumulation is a hot launch; slow accumulation is not.</li>
+    </ul>
+    <p>Board: every protocol that records no token and is not a wrapped, staked or bridged product, a versioned copy or an exchange product — 201 rows, the 40-protocol watchlist included. Farm plans are 7 steps each: capital by TVL tier ($250–$5,000), hold window by age (90/180/365 days), chain-aware, with an exit plan and a risk note where the data supports one. Implied values are this entry's own claim, never make.fun's; "records no token" means DefiLlama's record carries none, not that none exists.</p>
+    <h3>Category multiples</h3>
+    <table class="mini"><thead><tr><th>Category</th><th class="num">Comparables</th><th class="num">Multiple used</th><th class="num">Median ratio</th><th class="num">IQR</th></tr></thead><tbody id="catRows"></tbody></table>
+    <p class="note">Categories with fewer than 3 live-token comparables use the global trimmed multiple (0.382); the median and IQR shown for them are the global figures.</p>
+  </section>
+</main>
+
+<footer>Token Radar 3 · snapshot <span id="asOf"></span> · built from the sealed snapshot only, no network · implied values are the entry's own claim</footer>
+<script src="zz-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
