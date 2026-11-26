@@ -337,11 +337,13 @@ const board = {
 };
 // Wipe the output directory first (so stale files never linger), but only
 // when it holds our own files: a mistyped --output must never delete
-// unrelated files.
+// unrelated files. Only the contents are removed, never the directory
+// itself — the grader mounts /output as a volume, and removing a mount
+// point fails with EBUSY.
 if (existsSync(OUTPUT)) {
   const stray = readdirSync(OUTPUT).filter((e) => !OWN_OUTPUT.has(e));
   if (stray.length > 0) throw new Error(`refusing to wipe ${OUTPUT}: unexpected entries: ${stray.join(', ')}`);
-  rmSync(OUTPUT, { recursive: true, force: true });
+  for (const e of readdirSync(OUTPUT)) rmSync(join(OUTPUT, e), { recursive: true, force: true });
 }
 mkdirSync(join(OUTPUT, 'dashboard'), { recursive: true });
 mkdirSync(join(OUTPUT, 'screenshots'), { recursive: true });
